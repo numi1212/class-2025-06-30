@@ -1,0 +1,57 @@
+---
+title: "Massachussets Income"
+author: Muhammad Numan
+execute: 
+  echo: false
+---
+
+```{r, message=FALSE, warning=FALSE}
+
+options(tigris_use_cache = TRUE)
+library(tidycensus)
+library(tidyverse)
+library(ggplot2)
+library(sf)
+library(viridis)
+
+census_api_key("70e996c6c488ac3bef5449f06d32517b4c12559e")
+readRenviron("~/.Renviron")  # Load the API key
+
+ma_income <- get_acs(
+  geography = "tract",
+  variables = "B19013_001",
+  state = "MA",
+  year = 2022,
+  survey = "acs5",
+  geometry = TRUE
+  )
+
+# View the first few rows
+#head(ma_income)
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+ggplot(ma_income) +
+  geom_sf(aes(fill = estimate), color = NA) +
+  scale_fill_viridis(
+    option = "plasma",
+    na.value = "grey80",
+    name = "Median Income ($)",
+    direction = -1
+  ) +
+  labs(
+    title = "Median Household Income by Census Tract",
+    subtitle = "Massachusetts - ACS 2022 (5-Year Estimates)",
+    caption = "Source: U.S. Census Bureau via tidycensus"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
